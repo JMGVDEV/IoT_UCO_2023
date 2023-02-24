@@ -2,30 +2,41 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-const char* ssid = "Tu_SSID";
-const char* password = "Tu_Password";
+const char* ssid = "IOTUCO";
+const char* password = "LifeIsIoT";
 
 ESP8266WebServer server(80);
 
-int ledPin = 2;
+int ledPin = D4;
+int ledPin2 = D5;
 bool ledState = LOW;
+bool ledState2 = LOW;
 
 void handleRoot() {
   String html = "<html><body><h1>Control de LED</h1>";
   html += "<label class=\"switch\">";
-  html += "<input type=\"checkbox\" onclick=\"sendRequest(this.checked)\">";
+  html += "<input type=\"checkbox\" onclick=\"sendRequest(this.checked,'1')\">";
   if(ledState) {
     html += "<div class=\"slider round checked\"></div>";
   } else {
     html += "<div class=\"slider round\"></div>";
   }
   html += "</label>";
+  html += "<h1>Control de LED 2</h1>";
+  html += "<label class=\"switch\">";
+  html += "<input type=\"checkbox\" onclick=\"sendRequest(this.checked,'2')\">";
+  if(ledState2) {
+    html += "<div class=\"slider round checked\"></div>";
+  } else {
+    html += "<div class=\"slider round\"></div>";
+  }
+  html += "</label>";
   html += "<script>";
-  html += "function sendRequest(checked) {";
+  html += "function sendRequest(checked,led) {";
   html += "var xhttp = new XMLHttpRequest();";
   html += "xhttp.open('POST', '/', true);";
   html += "xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
-  html += "xhttp.send('command=' + (checked ? 'on' : 'off'));";
+  html += "xhttp.send('command=' + (checked ? 'on' : 'off') + led);";
   html += "}";
   html += "</script>";
   html += "<style>";
@@ -83,12 +94,18 @@ void handleRoot() {
 void handlePost() {
   if(server.hasArg("command")) {
     String command = server.arg("command");
-    if(command == "on") {
+    Serial.println(command);
+    if(command == "on1") {
       ledState = HIGH;
-    } else if(command == "off") {
+    } else if(command == "off1") {
       ledState = LOW;
+    } else if(command == "on2") {
+      ledState2 = HIGH;
+    } else if(command == "off2") {
+      ledState2 = LOW;
     }
     digitalWrite(ledPin, ledState);
+    digitalWrite(ledPin2, ledState2);
   }
   server.sendHeader("Location", "/");
   server.send(303);
@@ -96,7 +113,9 @@ void handlePost() {
 
 void setup() {
   pinMode(ledPin, OUTPUT);
+  pinMode(ledPin2, OUTPUT);
   digitalWrite(ledPin, ledState);
+  digitalWrite(ledPin2, ledState2);
 
   Serial.begin(9200);
   WiFi.begin(ssid, password);
