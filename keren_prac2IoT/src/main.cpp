@@ -5,15 +5,12 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "IOTUCO";
-const char* password = "LifeIsIoT";
-/*const char* ssid = "CASTANO";
-const char* password = "24372722";*/
-//const char* mqtt_server = "10.209.23.135";
+const char* ssid = "XXXXXXXxx";
+const char* password = "XXXXXXXx";
 
-const char * mqtt_server = "10.209.23.135";//name of the mqtt broker
-const char * MQTT_user = "K";//username to access to the broker
-const char * MQTT_password = "KKK";//password to access to the broker
+const char * mqtt_server = "XXXXXx";//name of the mqtt broker
+const char * MQTT_user = "X";//username to access to the broker
+const char * MQTT_password = "XXXXXXXX";//password to access to the broker
  
 const char* input = "/input_tz";
 const char* output = "/publish_tz";
