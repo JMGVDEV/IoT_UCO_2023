@@ -4,13 +4,13 @@
 #include <ArduinoJson.h>
 #include <TimeLib.h>
 
-const char *ssid = "IOTUCO";
-const char *password = "LifeIsIoT";
+const char *ssid = "TU_SSID";
+const char *password = "TU_PASSWORD";
 
-const char *mqttServer = "driver.cloudmqtt.com";
-const int mqttPort = 18627;
-const char *mqttUser = "IoT";
-const char *mqttPassword = "UCO2023";
+const char *mqttServer = "TU_SERVER";
+const int mqttPort = 000000;
+const char *mqttUser = "TU_USUARIO";
+const char *mqttPassword = "TU_CONTRASEÑA";
 const char *inputTopicSub = "input";
 const char *aliveTopicPub = "alive";
 const char *StatusRequestTopicPub = "StatusRequest";
