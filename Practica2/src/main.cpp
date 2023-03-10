@@ -95,6 +95,15 @@ String readResponse(WiFiClient client)
   return response;
 }
 
+String validateBody(String body)
+{
+  if (body == NULL || body.isEmpty())
+  {
+    return "No se retorno una respuesta desde el servidor";
+  }
+  return "";
+}
+
 void getTimeZone(String timeZone)
 {
   // Creación del objeto WiFiClient para hacer la petición HTTP
@@ -105,6 +114,7 @@ void getTimeZone(String timeZone)
   if (!client.connect(host, 80))
   {
     Serial.println("Error al conectarse al servidor.");
+    clientMQTT.publish(JsonStatusTopicPub, "Error al conectarse al servidor.");
     return;
   }
 
@@ -129,7 +139,7 @@ void getTimeZone(String timeZone)
   String httpStatus = response.substring(0, response.indexOf("\n"));
   Serial.println(httpStatus);
   Serial.println();
-  httpStatus = httpStatus.substring(httpStatus.lastIndexOf(" "));
+  //httpStatus = httpStatus.substring(httpStatus.lastIndexOf(" "));
   clientMQTT.publish(StatusRequestTopicPub, httpStatus.c_str());
 
   if (httpStatus.indexOf("OK") != -1)
@@ -144,18 +154,27 @@ void getTimeZone(String timeZone)
     Serial.println("Contenido de body:");
     Serial.println(body);
 
-    clientMQTT.publish(JsonStatusTopicPub, "Trama procesada");
+    String error = validateBody(body);
+    if (error.isEmpty())
+    {
+      // Obtener el cuerpo del mensaje como un objeto JSON
+      DynamicJsonDocument doc(1024); // Tamaño del objeto JSON en bytes
+      deserializeJson(doc, body);
 
-    // Obtener el cuerpo del mensaje como un objeto JSON
-    DynamicJsonDocument doc(1024); // Tamaño del objeto JSON en bytes
-    deserializeJson(doc, body);
+      // Obtener el valor del atributo "datetime"
+      String datetime = doc["datetime"];
 
-    // Obtener el valor del atributo "datetime"
-    String datetime = doc["datetime"];
-
-    // Imprimir el valor obtenido
-    Serial.println(datetime);
-    clientMQTT.publish(OutputTopicPub, formatDateTime(datetime).c_str());
+      // Imprimir el valor obtenido
+      Serial.println(datetime);
+      clientMQTT.publish(JsonStatusTopicPub, "Trama procesada");
+      clientMQTT.publish(OutputTopicPub, formatDateTime(datetime).c_str());
+    } else {
+      clientMQTT.publish(JsonStatusTopicPub, error.c_str());
+    }
+  }
+  else
+  {
+    clientMQTT.publish(JsonStatusTopicPub, "Error procesando la solicitud");
   }
 
   Serial.println("_______________________________________________");
